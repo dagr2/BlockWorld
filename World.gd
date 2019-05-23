@@ -3,6 +3,7 @@ extends Spatial
 # Declare member variables here. Examples:
 # var a = 2
 # var b = "text"
+var chunks={}
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -23,4 +24,9 @@ func get_blocks():
 func _process(delta):
     if Input.is_action_just_pressed("ui_cancel"):
         get_tree().change_scene("res://MainMenu.tscn")
+        
+    var p = $Player
+   
+    var cp=Vector3(round(p.translation.x/16.0),round(p.translation.y/16.0),round(p.translation.z/16.0))
+    $Label2.text=str(cp)
 #    pass

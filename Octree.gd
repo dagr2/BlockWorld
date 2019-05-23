@@ -27,6 +27,9 @@ class Octet:
     position=pos
     size=s
     
+  func is_in(pos):
+    return pos.x>=position.x and pos.x<=position.x+size.x and pos.y>=position.y and pos.y<=position.y+size.y and pos.z>=position.z and pos.z<=position.z+size.z
+
   func get_block(pos):
     var sx
     var sy
@@ -80,6 +83,9 @@ class Octet:
         subs[[sx,sy,sz]].set_block(pos,val)
     else:
       print(str(pos)+" is not in")
+  
+func is_in(pos):
+  return pos.x>=position.x and pos.x<=position.x+size.x and pos.y>=position.y and pos.y<=position.y+size.y and pos.z>=position.z and pos.z<=position.z+size.z
   
 func _init(pos,s):
   position=pos

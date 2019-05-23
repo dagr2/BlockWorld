@@ -7,7 +7,7 @@ export(int) var Blocks=8192
 var blocks = {}
 var octrees=[]
 var mat = load("res://mat1.tres")
-var oct = load("res://Octree.gd").new(Vector3(-Blocks/2,-Blocks/2,-Blocks/2),Vector3(Blocks,Blocks,Blocks))
+#var oct = load("res://Octree.gd").new(Vector3(-Blocks/2,-Blocks/2,-Blocks/2),Vector3(Blocks,Blocks,Blocks))
 var collisionShape=CollisionShape.new()
 var meshInstance = MeshInstance.new()
 
@@ -19,9 +19,12 @@ func _init(x,z):
     for y in range(4):
         var o=load("res://Octree.gd").new(Vector3(x*16-8,y*16-8,z*16-8),Vector3(16,16,16))
         octrees.append(o)
-        SetBlock(0,y*16,0,1)
-        
+    for dy in range(-8,8):
+      for dx in range(-8,8):
+        SetBlock(dx,1,dy,1)
+    
 func _ready():
+  collisionShape.disabled=false
   add_child(collisionShape)
   add_child(meshInstance)
 
@@ -88,19 +91,22 @@ func SetBlock(x,y,z,v):
   if z==-0:
     z=0
   print("Set block at "+str(x)+", "+str(y)+", "+str(z)+", ")
-  var t = Thread.new()
+  #var t = Thread.new()
   #threads.append(t)
   #blocks[str(x)+","+str(y)+","+str(z)]=v
-  oct.set_block(Vector3(x,y,z),v)
+  for o in octrees:
+    if o.is_in(Vector3(x,y,z)):
+      o.set_block(Vector3(x,y,z),v)
   #t.start(self,"BuildGeometry")
   BuildGeometry(0)
   
 func GetBlock(x,y,z):
-  return oct.get_block(Vector3(x,y,z))
-  if blocks.has(str(x)+","+str(y)+","+str(z)):
-    return blocks[str(x)+","+str(y)+","+str(z)]
-  else:
-    return 0
+  var res=0
+  for oct in octrees:
+    if oct.is_in(Vector3(x,y,z)):
+      res= oct.get_block(Vector3(x,y,z))
+  return res
+
     
 func BuildGeometry(i):
   var verts=[]
@@ -109,7 +115,7 @@ func BuildGeometry(i):
   var w2=w/2.0
   var drawn=0
   
-  var all=oct.get_blocks()
+  var all=get_blocks()
   for block in all:
     #var block=all[i]
     var x=block.pos.x

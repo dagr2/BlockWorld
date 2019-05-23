@@ -10,8 +10,10 @@ var is_flying=true
 var Jumppower=10
 var is_grav=false
 var Gravity=0
+var world
 
 func _ready():
+    world=get_parent()
     $Camera/Crosshair.position.x=OS.window_size.x/2
     $Camera/Crosshair.position.y=OS.window_size.y/2
     Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
@@ -20,6 +22,14 @@ func _input(event):
     if event is InputEventMouseMotion:
         pitch -= event.relative.x*sens
         yaw += event.relative.y*sens
+        
+    if event is InputEventMouseButton and event.pressed and event.button_index == 1:
+        if $Camera/RayCast.is_colliding():
+            var res=get_clicked_block()
+            var p3=res.Block
+            var chunk = res.Chunk
+            
+            chunk.SetBlock(p3.x,p3.y,p3.z,0)
         
     if event is InputEventKey and event.scancode==KEY_B:
         print(get_parent().get_blocks())
@@ -78,3 +88,14 @@ func _process(delta):
     move_and_slide(vel+walk+fly,Vector3(0,1,0))  
     
     get_parent().get_node("Label").text=str(translation)+",     \n"+str(pitch)+", "+str(yaw)
+    
+func get_clicked_block():
+    var p=$Camera/RayCast.get_collision_point()
+    var n=$Camera/RayCast.get_collision_normal()
+    var p2=p-n/2
+    var p3=Vector3(round(p2.x),round(p2.y),round(p2.z))
+    var chunk = $Camera/RayCast.get_collider()    
+    var res={}
+    res.Chunk=chunk
+    res.Block=p3
+    return res

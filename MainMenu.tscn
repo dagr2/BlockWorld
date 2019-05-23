@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://MainMenu.gd" type="Script" id=1]
+
+[node name="MainMenu" type="Control"]
+script = ExtResource( 1 )
+
+[node name="Button" type="Button" parent="."]
+margin_left = 308.225
+margin_top = 41.903
+margin_right = 742.225
+margin_bottom = 115.903
+text = "Start"
+
+[node name="Button2" type="Button" parent="."]
+margin_left = 443.038
+margin_top = 455.344
+margin_right = 626.038
+margin_bottom = 545.344
+text = "Exit"
+[connection signal="pressed" from="Button" to="." method="_on_Button_pressed"]
+[connection signal="pressed" from="Button2" to="." method="_on_Button2_pressed"]

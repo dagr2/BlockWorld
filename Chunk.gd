@@ -5,16 +5,32 @@ export(float) var BlockWidth=1.0/8
 export(int) var Blocks=8192
 
 var blocks = {}
-var mat = preload("res://mat1.tres")
-var oct = preload("res://octree.gd").new(Vector3(-Blocks/2,-Blocks/2,-Blocks/2),Vector3(Blocks,Blocks,Blocks))
+var octrees=[]
+var mat = load("res://mat1.tres")
+var oct = load("res://Octree.gd").new(Vector3(-Blocks/2,-Blocks/2,-Blocks/2),Vector3(Blocks,Blocks,Blocks))
+var collisionShape=CollisionShape.new()
+var meshInstance = MeshInstance.new()
 
-func _init(blocks):
-  Blocks=blocks
-  oct = preload("res://octree.gd").new(Vector3(-Blocks/2,-Blocks/2,-Blocks/2),Vector3(Blocks,Blocks,Blocks))  
+#func _init(blocks):
+#  Blocks=blocks
+#  oct = preload("res://octree.gd").new(Vector3(-Blocks/2,-Blocks/2,-Blocks/2),Vector3(Blocks,Blocks,Blocks))  
 
+func _init(x,z):
+    for y in range(4):
+        var o=load("res://Octree.gd").new(Vector3(x*16-8,y*16-8,z*16-8),Vector3(16,16,16))
+        octrees.append(o)
+        SetBlock(0,y*16,0,1)
+        
 func _ready():
-  pass
+  add_child(collisionShape)
+  add_child(meshInstance)
 
+func get_blocks():
+    var res=[]
+    for o in octrees:
+        for b in o.get_blocks():
+            res.append(b)
+    return res
 
 func get_side(norm):
     if norm==Vector3(0,1,0):
@@ -167,12 +183,13 @@ func BuildGeometry(i):
           verts.append(Vector3( w*x+w2, y*w+w2, w*z-w2))
   var conc=ConcavePolygonShape.new()
   conc.set_faces(verts)
-  $CollisionShape.shape=conc
+  
+  collisionShape.shape=conc
   var st = SurfaceTool.new()
   st.begin(Mesh.PRIMITIVE_TRIANGLES)
   for vert in verts:
     st.add_vertex(vert)
   st.generate_normals()
   st.set_material(mat)        
-  $MeshInstance.mesh=st.commit()
+  meshInstance.mesh=st.commit()
   print(str(drawn)+" blocks drawn")    
